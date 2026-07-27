@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "cordglean"
 version = "0.1.0"
-description = "Full-fidelity Discord context for agents"
+description = "full-fidelity Discord context for agents"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }

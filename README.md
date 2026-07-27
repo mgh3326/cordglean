@@ -1,5 +1,7 @@
 # cordglean
 
+*full-fidelity Discord context for agents*
+
 cordglean is a self-hosted Discord MCP server with full-fidelity embeds, channel and thread search, messaging, replies, and reactions.
 
 The current v1 is deliberately read-only. It makes Discord bot messages useful
