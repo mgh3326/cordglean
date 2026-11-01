@@ -1,0 +1,194 @@
+{
+  "tools": [
+    {
+      "name": "read_channel",
+      "description": "Read messages, complete embeds, and attachment metadata from a channel.",
+      "inputSchema": {
+        "properties": {
+          "channel_id": {
+            "title": "Channel Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Before"
+          },
+          "after": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "After"
+          }
+        },
+        "required": [
+          "channel_id"
+        ],
+        "title": "read_channelArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "read_channelDictOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_message",
+      "description": "Read one message with complete embed rendering and optional raw embeds.",
+      "inputSchema": {
+        "properties": {
+          "channel_id": {
+            "title": "Channel Id",
+            "type": "string"
+          },
+          "message_id": {
+            "title": "Message Id",
+            "type": "string"
+          },
+          "include_raw_embeds": {
+            "default": true,
+            "title": "Include Raw Embeds",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "channel_id",
+          "message_id"
+        ],
+        "title": "get_messageArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "get_messageDictOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "read_thread",
+      "description": "Read messages and complete embeds from a Discord thread.",
+      "inputSchema": {
+        "properties": {
+          "thread_id": {
+            "title": "Thread Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "before": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Before"
+          },
+          "after": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "After"
+          }
+        },
+        "required": [
+          "thread_id"
+        ],
+        "title": "read_threadArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "read_threadDictOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "list_channels",
+      "description": "List channels visible to the bot in a guild.",
+      "inputSchema": {
+        "properties": {
+          "guild_id": {
+            "title": "Guild Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "guild_id"
+        ],
+        "title": "list_channelsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "list_channelsDictOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "read_user_profile",
+      "description": "Read a Discord user, or their richer guild member profile when given a guild.",
+      "inputSchema": {
+        "properties": {
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          },
+          "guild_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Guild Id"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "read_user_profileArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "read_user_profileDictOutput",
+        "type": "object"
+      }
+    }
+  ]
+}

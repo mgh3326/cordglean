@@ -1,0 +1,148 @@
+[
+  {
+    "name": "read_channel",
+    "tool": "read_channel",
+    "arguments": {
+      "channel_id": "101"
+    },
+    "request": {
+      "method": "GET",
+      "path": "/api/v10/channels/101/messages",
+      "query": {
+        "limit": "20"
+      }
+    },
+    "fixture": "channel_messages",
+    "golden": "read_channel.golden.json"
+  },
+  {
+    "name": "read_channel_before",
+    "tool": "read_channel",
+    "arguments": {
+      "channel_id": "101",
+      "limit": 2,
+      "before": "304"
+    },
+    "request": {
+      "method": "GET",
+      "path": "/api/v10/channels/101/messages",
+      "query": {
+        "limit": "2",
+        "before": "304"
+      }
+    },
+    "fixture": "channel_messages",
+    "golden": "read_channel_before.golden.json"
+  },
+  {
+    "name": "read_channel_empty",
+    "tool": "read_channel",
+    "arguments": {
+      "channel_id": "103",
+      "after": "301"
+    },
+    "request": {
+      "method": "GET",
+      "path": "/api/v10/channels/103/messages",
+      "query": {
+        "limit": "20",
+        "after": "301"
+      }
+    },
+    "fixture": "empty_messages",
+    "golden": "read_channel_empty.golden.json"
+  },
+  {
+    "name": "get_message",
+    "tool": "get_message",
+    "arguments": {
+      "channel_id": "101",
+      "message_id": "303"
+    },
+    "request": {
+      "method": "GET",
+      "path": "/api/v10/channels/101/messages/303",
+      "query": {}
+    },
+    "fixture": "single_message",
+    "golden": "get_message.golden.json"
+  },
+  {
+    "name": "get_message_no_raw",
+    "tool": "get_message",
+    "arguments": {
+      "channel_id": "101",
+      "message_id": "303",
+      "include_raw_embeds": false
+    },
+    "request": {
+      "method": "GET",
+      "path": "/api/v10/channels/101/messages/303",
+      "query": {}
+    },
+    "fixture": "single_message",
+    "golden": "get_message_no_raw.golden.json"
+  },
+  {
+    "name": "read_thread",
+    "tool": "read_thread",
+    "arguments": {
+      "thread_id": "201",
+      "limit": 1,
+      "after": "402"
+    },
+    "request": {
+      "method": "GET",
+      "path": "/api/v10/channels/201/messages",
+      "query": {
+        "limit": "1",
+        "after": "402"
+      }
+    },
+    "fixture": "thread_messages",
+    "golden": "read_thread.golden.json"
+  },
+  {
+    "name": "list_channels",
+    "tool": "list_channels",
+    "arguments": {
+      "guild_id": "100"
+    },
+    "request": {
+      "method": "GET",
+      "path": "/api/v10/guilds/100/channels",
+      "query": {}
+    },
+    "fixture": "channels",
+    "golden": "list_channels.golden.json"
+  },
+  {
+    "name": "read_user_profile",
+    "tool": "read_user_profile",
+    "arguments": {
+      "user_id": "42"
+    },
+    "request": {
+      "method": "GET",
+      "path": "/api/v10/users/42",
+      "query": {}
+    },
+    "fixture": "user",
+    "golden": "read_user_profile.golden.json"
+  },
+  {
+    "name": "read_user_profile_guild",
+    "tool": "read_user_profile",
+    "arguments": {
+      "user_id": "42",
+      "guild_id": "100"
+    },
+    "request": {
+      "method": "GET",
+      "path": "/api/v10/guilds/100/members/42",
+      "query": {}
+    },
+    "fixture": "guild_member",
+    "golden": "read_user_profile_guild.golden.json"
+  }
+]

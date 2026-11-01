@@ -1,0 +1,95 @@
+{
+  "python_commit": "ce7599c026c7159a0677063f98fe24bf48f3ecc1",
+  "python_source_sha256": {
+    "src/cordglean/__init__.py": "44981c46c5600a1f219b44cd07f6e72a77fe39b834aabf5f0a7156a09a0e42dd",
+    "src/cordglean/config.py": "b2bcabcb62906bfc6ffc1636254e9a781082ab8416fcad210f5a4ea1ad6b4f19",
+    "src/cordglean/discord.py": "e2b700ca6ab017b4ea81f03f93de55695725aaaf681ba0afe64c23b59e0747f8",
+    "src/cordglean/render.py": "6cb7d540f23f6c4034e5fe224f0445b5a716f1c1f17c7576569c76855b040397",
+    "src/cordglean/server.py": "7325f269dd87baaeeb6a67c22fb7df05fb0bdeaf28969eb28f2b1e27c3006be4"
+  },
+  "python_version": "3.14.4",
+  "mcp_version": "1.28.1",
+  "httpx_version": "0.28.1",
+  "transport": "mcp.shared.memory.create_connected_server_and_client_session",
+  "discord_transport": "httpx.MockTransport",
+  "settings": "explicit synthetic Settings; no environment config loaded",
+  "capture_script_sha256": "913034b0a31821ba018bdf26a906e0fb277adc7f6a64c8f8d7a32aba6823ef64",
+  "mcp_call_result_sha256": {
+    "read_channel": "13220621226aaeec92d1eab552bf9c4c06c78e584592b7249120f1d934383c32",
+    "read_channel_before": "9eeb03b5234c1d93ad5df8e0db5be9646c7c3052f08ba8198f5fbe5512bf993d",
+    "read_channel_empty": "97abe8adea9085062efbcbb74c811b39c9a6bc2aad82c80e6f5589289e35814c",
+    "get_message": "dc92ae2e168cdcd1e9b70d37eb75d34a60441d8531582eb932947e5e88df7331",
+    "get_message_no_raw": "df9c708e0f0cece716acf9273f25fc892e890824551cc7da3c75829ca33383bd",
+    "read_thread": "3bd61569d721c523dde12e13e14248900e3edf9eecf7a68b1074cfdec7b65bcf",
+    "list_channels": "845c11d9f26a64d353770069787b1a5f236283241428d2a095263b7f2fbb4c91",
+    "read_user_profile": "d1a888711519f1b569eea9d15028b5e92e0cae9c1cf058f7c820feba662d1780",
+    "read_user_profile_guild": "8fd560e940554a1c00b425db4e937f18f7b09ce62c1fca63227019ce1a9571d6"
+  },
+  "requests": [
+    {
+      "case": "read_channel",
+      "method": "GET",
+      "path": "/api/v10/channels/101/messages",
+      "query": {
+        "limit": "20"
+      }
+    },
+    {
+      "case": "read_channel_before",
+      "method": "GET",
+      "path": "/api/v10/channels/101/messages",
+      "query": {
+        "limit": "2",
+        "before": "304"
+      }
+    },
+    {
+      "case": "read_channel_empty",
+      "method": "GET",
+      "path": "/api/v10/channels/103/messages",
+      "query": {
+        "limit": "20",
+        "after": "301"
+      }
+    },
+    {
+      "case": "get_message",
+      "method": "GET",
+      "path": "/api/v10/channels/101/messages/303",
+      "query": {}
+    },
+    {
+      "case": "get_message_no_raw",
+      "method": "GET",
+      "path": "/api/v10/channels/101/messages/303",
+      "query": {}
+    },
+    {
+      "case": "read_thread",
+      "method": "GET",
+      "path": "/api/v10/channels/201/messages",
+      "query": {
+        "limit": "1",
+        "after": "402"
+      }
+    },
+    {
+      "case": "list_channels",
+      "method": "GET",
+      "path": "/api/v10/guilds/100/channels",
+      "query": {}
+    },
+    {
+      "case": "read_user_profile",
+      "method": "GET",
+      "path": "/api/v10/users/42",
+      "query": {}
+    },
+    {
+      "case": "read_user_profile_guild",
+      "method": "GET",
+      "path": "/api/v10/guilds/100/members/42",
+      "query": {}
+    }
+  ]
+}
