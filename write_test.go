@@ -364,6 +364,29 @@ func TestMessageBoundariesAndExplicitMassMention(t *testing.T) {
 	}
 }
 
+func TestMissingEmbedTextIsRefusedBeforeHTTP(t *testing.T) {
+	for _, embed := range []object{
+		{"fields": []any{object{}}},
+		{"fields": []any{object{"name": "field"}}},
+		{"fields": []any{object{"value": "value"}}},
+		{"footer": object{}},
+		{"author": object{}},
+	} {
+		requests := 0
+		session, _, _ := fakeMCP(t, testConfig(), func(*http.Request) (*http.Response, error) {
+			requests++
+			return fakeResponse(200, object{"id": "789"}), nil
+		})
+		result := callTool(t, session, "send_message", object{"channel_id": "123", "content": "", "embeds": []any{embed}})
+		if requests != 0 {
+			t.Fatalf("invalid embed sent %d HTTP request(s); want 0", requests)
+		}
+		if !result.IsError {
+			t.Fatal("missing required embed text was accepted")
+		}
+	}
+}
+
 func TestWriteRateLimitRetryBound(t *testing.T) {
 	for _, exhausted := range []bool{false, true} {
 		t.Run(strconv.FormatBool(exhausted), func(t *testing.T) {

@@ -121,7 +121,8 @@ func TestRetryAfterParsingAndLongDelayBound(t *testing.T) {
 		{"0.25", `{"retry_after":0.5}`, 250 * time.Millisecond},
 		{"NaN", `{"retry_after":0.5}`, 500 * time.Millisecond},
 		{"", `{"retry_after":"Infinity"}`, time.Second},
-		{"-1", `{}`, 0}, {"", `{}`, time.Second},
+		{"-1", `{"retry_after":0.5}`, 500 * time.Millisecond},
+		{"-1", `{}`, time.Second}, {"", `{"retry_after":-1}`, time.Second}, {"", `{}`, time.Second},
 	} {
 		if got := retryAfter(tc.header, []byte(tc.body)); got != tc.want {
 			t.Fatalf("retry delay=%v, want=%v", got, tc.want)

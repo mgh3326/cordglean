@@ -27,6 +27,12 @@ func validateEmbeds(embeds []object) error {
 		total += n
 		return nil
 	}
+	requiredField := func(m object, key string, limit int) error {
+		if _, present := m[key]; !present {
+			return errors.New("embed is missing a required text field")
+		}
+		return field(m, key, limit)
+	}
 	for _, embed := range embeds {
 		if embed == nil {
 			return errors.New("embeds must contain objects")
@@ -45,7 +51,7 @@ func validateEmbeds(embeds []object) error {
 				if m == nil {
 					return errors.New("embed author and footer must be objects")
 				}
-				if err := field(m, spec.text, spec.limit); err != nil {
+				if err := requiredField(m, spec.text, spec.limit); err != nil {
 					return err
 				}
 			}
@@ -60,10 +66,10 @@ func validateEmbeds(embeds []object) error {
 				if m == nil {
 					return errors.New("embed fields must contain objects")
 				}
-				if err := field(m, "name", 256); err != nil {
+				if err := requiredField(m, "name", 256); err != nil {
 					return err
 				}
-				if err := field(m, "value", 1024); err != nil {
+				if err := requiredField(m, "value", 1024); err != nil {
 					return err
 				}
 			}

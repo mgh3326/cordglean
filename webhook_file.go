@@ -41,6 +41,8 @@ func prepareSecretFile(path string, overwrite bool) (*secretFile, error) {
 			dest.staging = dest.file.Name()
 		}
 	} else {
+		// Reserve before POST to prevent duplicate creations for one path.
+		// A hard termination can leave an empty reservation requiring manual recovery.
 		dest.staging = abs
 		dest.file, err = os.OpenFile(abs, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
 	}
@@ -62,6 +64,7 @@ func (d *secretFile) commit(secret string) error {
 	if _, err := d.file.WriteString(secret); err != nil {
 		return &secretFileError{message: "webhook secret could not be saved"}
 	}
+	// This sync covers file data, not directory entries; power-loss recovery is not guaranteed.
 	if err := d.file.Sync(); err != nil {
 		return &secretFileError{message: "webhook secret could not be saved"}
 	}

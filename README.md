@@ -64,6 +64,10 @@ the webhook's channel before deleting it. Parent and archive categories must
 also be allowlisted. `create_channel` refuses while an ID allowlist is active
 because the new channel has no authorized ID yet.
 
+Webhook deletion checks the channel once, then deletes by webhook ID. A move
+between those requests is not checked again. To enforce the channel boundary
+through Discord, deny the bot Manage Webhooks in channels outside the allowlist.
+
 ## Read tools
 
 - `read_channel(channel_id, limit=20, before=null, after=null)`
@@ -150,9 +154,17 @@ if creation fails. Symlinks and directories are refused. A failure to save a
 created webhook triggers bounded, bot-authenticated cleanup. If cleanup fails,
 the error identifies the webhook ID for manual removal.
 
+The exclusive destination reservation prevents concurrent creations from both
+using the same path. Hard termination can leave an empty reserved file or an
+unfinished remote webhook. Inspect the destination and the channel's webhook
+list before retrying. File contents are synced, but directory changes are not;
+recovery after power loss is not guaranteed.
+
 Webhook tokens, URLs, response bodies, message content, names, and file paths
-are excluded from audit lines. Every management operation logs one line with
-the tool, target ID, and outcome to stderr. Management HTTP and filesystem
+are excluded from audit lines. Every management operation that reaches its
+handler logs one line with the tool, target ID, and outcome to stderr. The MCP
+SDK rejects invalid argument shapes before the handler runs, so those calls
+have no operation audit line. Management HTTP and filesystem
 errors use fixed descriptions instead of remote response bodies or raw errors.
 HTTP requests use only the bot token; webhook URLs are never requested.
 

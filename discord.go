@@ -138,7 +138,7 @@ func retryAfter(header string, body []byte) time.Duration {
 			return 0, false
 		}
 		if seconds < 0 {
-			seconds = 0
+			return 0, false
 		}
 		// Larger values need no exact conversion: they already exceed the retry bound.
 		if seconds > maxRateLimitWait.Seconds() {
