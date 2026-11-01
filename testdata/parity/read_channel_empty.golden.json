@@ -1,0 +1,14 @@
+{
+  "channel_id": "103",
+  "order": "newest_to_oldest",
+  "message_count": 0,
+  "page": {
+    "requested_limit": 20,
+    "before": null,
+    "after": "301",
+    "newest_message_id": null,
+    "oldest_message_id": null,
+    "possibly_more": false
+  },
+  "messages": []
+}

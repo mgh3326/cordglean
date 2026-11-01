@@ -1,0 +1,15 @@
+{
+  "source": "user",
+  "profile": {
+    "id": "42",
+    "username": "fixture-user",
+    "global_name": "Fixture User",
+    "discriminator": "0",
+    "avatar": null,
+    "bot": false,
+    "public_flags": 64,
+    "future_user_key": {
+      "keep": true
+    }
+  }
+}

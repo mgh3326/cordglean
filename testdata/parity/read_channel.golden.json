@@ -1,0 +1,294 @@
+{
+  "channel_id": "101",
+  "order": "newest_to_oldest",
+  "message_count": 2,
+  "page": {
+    "requested_limit": 20,
+    "before": null,
+    "after": null,
+    "newest_message_id": "303",
+    "oldest_message_id": "302",
+    "possibly_more": false
+  },
+  "messages": [
+    {
+      "id": "303",
+      "channel_id": "101",
+      "guild_id": "100",
+      "type": 0,
+      "content": "Fixture status\nSecond line",
+      "display_text": "Fixture status\nSecond line\n\n[Embed 1]\nTitle: Build status\nAll fixture checks passed.\nURL: https://example.invalid/build/7\nAuthor: Fixture service (https://example.invalid/service)\nField 1 inline — Duration:\n42 seconds\nField 2 — Details:\none\ntwo\nField 3 — Zero:\n0\nFooter: Fixture footer\nTimestamp: 2026-01-02T03:04:00+00:00\nProvider: Fixture provider\nThumbnail: https://example.invalid/thumb.png\nImage: https://example.invalid/image.png\nVideo: https://example.invalid/video.mp4\n\n[Embed 2]\nUnicode fixture: 한글 · café\nField 1 — Fallback inline:\nvisible\n\n[Attachment] fixture.json (application/json), 42 bytes\nhttps://example.invalid/fixture.json",
+      "timestamp": "2026-01-02T03:04:05+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "42",
+        "username": "fixture-bot",
+        "bot": true
+      },
+      "webhook_id": "701",
+      "pinned": true,
+      "tts": false,
+      "mention_everyone": false,
+      "mentions": [
+        {
+          "id": "43",
+          "username": "fixture-reader"
+        }
+      ],
+      "mention_roles": [
+        "501"
+      ],
+      "message_reference": {
+        "message_id": "302",
+        "channel_id": "101"
+      },
+      "flags": 4,
+      "rendered_embeds": [
+        {
+          "text": "[Embed 1]\nTitle: Build status\nAll fixture checks passed.\nURL: https://example.invalid/build/7\nAuthor: Fixture service (https://example.invalid/service)\nField 1 inline — Duration:\n42 seconds\nField 2 — Details:\none\ntwo\nField 3 — Zero:\n0\nFooter: Fixture footer\nTimestamp: 2026-01-02T03:04:00+00:00\nProvider: Fixture provider\nThumbnail: https://example.invalid/thumb.png\nImage: https://example.invalid/image.png\nVideo: https://example.invalid/video.mp4",
+          "title": "Build status",
+          "description": "All fixture checks passed.",
+          "url": "https://example.invalid/build/7",
+          "type": "rich",
+          "color": 3066993,
+          "flags": 32,
+          "timestamp": "2026-01-02T03:04:00+00:00",
+          "fields": [
+            {
+              "name": "Duration",
+              "value": "42 seconds",
+              "inline": true
+            },
+            {
+              "name": "Details",
+              "value": "one\ntwo",
+              "inline": false
+            },
+            {
+              "name": "Zero",
+              "value": "0",
+              "inline": false
+            }
+          ],
+          "footer": {
+            "text": "Fixture footer",
+            "icon_url": "https://example.invalid/footer.png"
+          },
+          "author": {
+            "name": "Fixture service",
+            "url": "https://example.invalid/service",
+            "icon_url": "https://example.invalid/avatar.png"
+          },
+          "provider": {
+            "name": "Fixture provider",
+            "url": "https://example.invalid/provider"
+          },
+          "thumbnail": {
+            "url": "https://example.invalid/thumb.png",
+            "width": 16,
+            "height": 16
+          },
+          "image": {
+            "url": "https://example.invalid/image.png",
+            "width": 640,
+            "height": 480
+          },
+          "video": {
+            "url": "https://example.invalid/video.mp4",
+            "width": 320,
+            "height": 240
+          }
+        },
+        {
+          "text": "[Embed 2]\nUnicode fixture: 한글 · café\nField 1 — Fallback inline:\nvisible",
+          "title": null,
+          "description": "Unicode fixture: 한글 · café",
+          "url": null,
+          "type": null,
+          "color": null,
+          "flags": null,
+          "timestamp": null,
+          "fields": [
+            {
+              "name": "Fallback inline",
+              "value": "visible",
+              "inline": false
+            }
+          ],
+          "footer": null,
+          "author": null,
+          "provider": null,
+          "thumbnail": null,
+          "image": null,
+          "video": null
+        }
+      ],
+      "attachments": [
+        {
+          "id": "801",
+          "filename": "fixture.json",
+          "title": "Fixture report",
+          "description": "Complete fixture output",
+          "content_type": "application/json",
+          "size": 42,
+          "url": "https://example.invalid/fixture.json",
+          "proxy_url": "https://example.invalid/proxy/fixture.json",
+          "height": null,
+          "width": null,
+          "placeholder": "fixture-placeholder",
+          "placeholder_version": 1,
+          "ephemeral": false,
+          "duration_secs": 1.25,
+          "waveform": "fixture-waveform",
+          "flags": 0,
+          "clip_participants": [
+            "42"
+          ],
+          "clip_created_at": "2026-01-02T03:00:00+00:00",
+          "application": {
+            "id": "901"
+          },
+          "raw": {
+            "id": "801",
+            "filename": "fixture.json",
+            "title": "Fixture report",
+            "description": "Complete fixture output",
+            "content_type": "application/json",
+            "size": 42,
+            "url": "https://example.invalid/fixture.json",
+            "proxy_url": "https://example.invalid/proxy/fixture.json",
+            "height": null,
+            "width": null,
+            "placeholder": "fixture-placeholder",
+            "placeholder_version": 1,
+            "ephemeral": false,
+            "duration_secs": 1.25,
+            "waveform": "fixture-waveform",
+            "flags": 0,
+            "clip_participants": [
+              "42"
+            ],
+            "clip_created_at": "2026-01-02T03:00:00+00:00",
+            "application": {
+              "id": "901"
+            },
+            "future_attachment_key": {
+              "keep": "raw"
+            }
+          }
+        }
+      ],
+      "embeds": [
+        {
+          "title": "Build status",
+          "description": "All fixture checks passed.",
+          "url": "https://example.invalid/build/7",
+          "type": "rich",
+          "color": 3066993,
+          "timestamp": "2026-01-02T03:04:00+00:00",
+          "fields": [
+            {
+              "name": "Duration",
+              "value": "42 seconds",
+              "inline": true
+            },
+            {
+              "name": "Details",
+              "value": "one\ntwo",
+              "inline": false
+            },
+            {
+              "name": "Zero",
+              "value": "0"
+            }
+          ],
+          "footer": {
+            "text": "Fixture footer",
+            "icon_url": "https://example.invalid/footer.png"
+          },
+          "author": {
+            "name": "Fixture service",
+            "url": "https://example.invalid/service",
+            "icon_url": "https://example.invalid/avatar.png"
+          },
+          "provider": {
+            "name": "Fixture provider",
+            "url": "https://example.invalid/provider"
+          },
+          "thumbnail": {
+            "url": "https://example.invalid/thumb.png",
+            "width": 16,
+            "height": 16
+          },
+          "image": {
+            "url": "https://example.invalid/image.png",
+            "width": 640,
+            "height": 480
+          },
+          "video": {
+            "url": "https://example.invalid/video.mp4",
+            "width": 320,
+            "height": 240
+          },
+          "flags": 32,
+          "future_discord_key": {
+            "keep": true
+          }
+        },
+        {
+          "description": "Unicode fixture: 한글 · café",
+          "fields": [
+            {
+              "name": "Fallback inline",
+              "value": "visible"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "302",
+      "channel_id": "101",
+      "guild_id": null,
+      "type": null,
+      "content": "",
+      "display_text": "[Embed 1]\nEmbed-only fixture",
+      "timestamp": null,
+      "edited_timestamp": null,
+      "author": null,
+      "webhook_id": null,
+      "pinned": false,
+      "tts": false,
+      "mention_everyone": false,
+      "mentions": [],
+      "mention_roles": [],
+      "message_reference": null,
+      "flags": null,
+      "rendered_embeds": [
+        {
+          "text": "[Embed 1]\nEmbed-only fixture",
+          "title": null,
+          "description": "Embed-only fixture",
+          "url": null,
+          "type": null,
+          "color": null,
+          "flags": null,
+          "timestamp": null,
+          "fields": [],
+          "footer": null,
+          "author": null,
+          "provider": null,
+          "thumbnail": null,
+          "image": null,
+          "video": null
+        }
+      ],
+      "attachments": [],
+      "embeds": [
+        {
+          "description": "Embed-only fixture"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "source": "guild_member",
+  "profile": {
+    "user": {
+      "id": "42",
+      "username": "fixture-user",
+      "global_name": "Fixture User"
+    },
+    "nick": "Fixture nickname",
+    "avatar": null,
+    "roles": [
+      "501",
+      "502"
+    ],
+    "joined_at": "2026-01-01T00:00:00+00:00",
+    "premium_since": null,
+    "deaf": false,
+    "mute": false,
+    "flags": 0,
+    "pending": false,
+    "communication_disabled_until": null
+  }
+}

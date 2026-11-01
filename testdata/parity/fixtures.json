@@ -1,0 +1,475 @@
+{
+  "channel_messages": [
+    {
+      "id": "303",
+      "channel_id": "101",
+      "guild_id": "100",
+      "type": 0,
+      "content": "Fixture status\nSecond line",
+      "timestamp": "2026-01-02T03:04:05+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "42",
+        "username": "fixture-bot",
+        "bot": true
+      },
+      "webhook_id": "701",
+      "pinned": true,
+      "tts": false,
+      "mention_everyone": false,
+      "mentions": [
+        {
+          "id": "43",
+          "username": "fixture-reader"
+        }
+      ],
+      "mention_roles": [
+        "501"
+      ],
+      "message_reference": {
+        "message_id": "302",
+        "channel_id": "101"
+      },
+      "flags": 4,
+      "embeds": [
+        {
+          "title": "Build status",
+          "description": "All fixture checks passed.",
+          "url": "https://example.invalid/build/7",
+          "type": "rich",
+          "color": 3066993,
+          "timestamp": "2026-01-02T03:04:00+00:00",
+          "fields": [
+            {
+              "name": "Duration",
+              "value": "42 seconds",
+              "inline": true
+            },
+            {
+              "name": "Details",
+              "value": "one\ntwo",
+              "inline": false
+            },
+            {
+              "name": "Zero",
+              "value": "0"
+            }
+          ],
+          "footer": {
+            "text": "Fixture footer",
+            "icon_url": "https://example.invalid/footer.png"
+          },
+          "author": {
+            "name": "Fixture service",
+            "url": "https://example.invalid/service",
+            "icon_url": "https://example.invalid/avatar.png"
+          },
+          "provider": {
+            "name": "Fixture provider",
+            "url": "https://example.invalid/provider"
+          },
+          "thumbnail": {
+            "url": "https://example.invalid/thumb.png",
+            "width": 16,
+            "height": 16
+          },
+          "image": {
+            "url": "https://example.invalid/image.png",
+            "width": 640,
+            "height": 480
+          },
+          "video": {
+            "url": "https://example.invalid/video.mp4",
+            "width": 320,
+            "height": 240
+          },
+          "flags": 32,
+          "future_discord_key": {
+            "keep": true
+          }
+        },
+        {
+          "description": "Unicode fixture: 한글 · café",
+          "fields": [
+            {
+              "name": "Fallback inline",
+              "value": "visible"
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "id": "801",
+          "filename": "fixture.json",
+          "title": "Fixture report",
+          "description": "Complete fixture output",
+          "content_type": "application/json",
+          "size": 42,
+          "url": "https://example.invalid/fixture.json",
+          "proxy_url": "https://example.invalid/proxy/fixture.json",
+          "height": null,
+          "width": null,
+          "placeholder": "fixture-placeholder",
+          "placeholder_version": 1,
+          "ephemeral": false,
+          "duration_secs": 1.25,
+          "waveform": "fixture-waveform",
+          "flags": 0,
+          "clip_participants": [
+            "42"
+          ],
+          "clip_created_at": "2026-01-02T03:00:00+00:00",
+          "application": {
+            "id": "901"
+          },
+          "future_attachment_key": {
+            "keep": "raw"
+          }
+        }
+      ]
+    },
+    {
+      "id": "302",
+      "channel_id": "101",
+      "content": "",
+      "embeds": [
+        {
+          "description": "Embed-only fixture"
+        }
+      ],
+      "attachments": []
+    }
+  ],
+  "empty_messages": [],
+  "single_message": {
+    "id": "303",
+    "channel_id": "101",
+    "guild_id": "100",
+    "type": 0,
+    "content": "Fixture status\nSecond line",
+    "timestamp": "2026-01-02T03:04:05+00:00",
+    "edited_timestamp": null,
+    "author": {
+      "id": "42",
+      "username": "fixture-bot",
+      "bot": true
+    },
+    "webhook_id": "701",
+    "pinned": true,
+    "tts": false,
+    "mention_everyone": false,
+    "mentions": [
+      {
+        "id": "43",
+        "username": "fixture-reader"
+      }
+    ],
+    "mention_roles": [
+      "501"
+    ],
+    "message_reference": {
+      "message_id": "302",
+      "channel_id": "101"
+    },
+    "flags": 4,
+    "embeds": [
+      {
+        "title": "Build status",
+        "description": "All fixture checks passed.",
+        "url": "https://example.invalid/build/7",
+        "type": "rich",
+        "color": 3066993,
+        "timestamp": "2026-01-02T03:04:00+00:00",
+        "fields": [
+          {
+            "name": "Duration",
+            "value": "42 seconds",
+            "inline": true
+          },
+          {
+            "name": "Details",
+            "value": "one\ntwo",
+            "inline": false
+          },
+          {
+            "name": "Zero",
+            "value": "0"
+          }
+        ],
+        "footer": {
+          "text": "Fixture footer",
+          "icon_url": "https://example.invalid/footer.png"
+        },
+        "author": {
+          "name": "Fixture service",
+          "url": "https://example.invalid/service",
+          "icon_url": "https://example.invalid/avatar.png"
+        },
+        "provider": {
+          "name": "Fixture provider",
+          "url": "https://example.invalid/provider"
+        },
+        "thumbnail": {
+          "url": "https://example.invalid/thumb.png",
+          "width": 16,
+          "height": 16
+        },
+        "image": {
+          "url": "https://example.invalid/image.png",
+          "width": 640,
+          "height": 480
+        },
+        "video": {
+          "url": "https://example.invalid/video.mp4",
+          "width": 320,
+          "height": 240
+        },
+        "flags": 32,
+        "future_discord_key": {
+          "keep": true
+        }
+      },
+      {
+        "description": "Unicode fixture: 한글 · café",
+        "fields": [
+          {
+            "name": "Fallback inline",
+            "value": "visible"
+          }
+        ]
+      }
+    ],
+    "attachments": [
+      {
+        "id": "801",
+        "filename": "fixture.json",
+        "title": "Fixture report",
+        "description": "Complete fixture output",
+        "content_type": "application/json",
+        "size": 42,
+        "url": "https://example.invalid/fixture.json",
+        "proxy_url": "https://example.invalid/proxy/fixture.json",
+        "height": null,
+        "width": null,
+        "placeholder": "fixture-placeholder",
+        "placeholder_version": 1,
+        "ephemeral": false,
+        "duration_secs": 1.25,
+        "waveform": "fixture-waveform",
+        "flags": 0,
+        "clip_participants": [
+          "42"
+        ],
+        "clip_created_at": "2026-01-02T03:00:00+00:00",
+        "application": {
+          "id": "901"
+        },
+        "future_attachment_key": {
+          "keep": "raw"
+        }
+      }
+    ]
+  },
+  "thread_messages": [
+    {
+      "id": "403",
+      "channel_id": "201",
+      "guild_id": "100",
+      "type": 0,
+      "content": "Thread fixture",
+      "timestamp": "2026-01-02T03:04:05+00:00",
+      "edited_timestamp": null,
+      "author": {
+        "id": "42",
+        "username": "fixture-bot",
+        "bot": true
+      },
+      "webhook_id": null,
+      "pinned": true,
+      "tts": false,
+      "mention_everyone": false,
+      "mentions": [
+        {
+          "id": "43",
+          "username": "fixture-reader"
+        }
+      ],
+      "mention_roles": [
+        "501"
+      ],
+      "message_reference": {
+        "message_id": "302",
+        "channel_id": "101"
+      },
+      "flags": 4,
+      "embeds": [
+        {
+          "title": "Build status",
+          "description": "All fixture checks passed.",
+          "url": "https://example.invalid/build/7",
+          "type": "rich",
+          "color": 3066993,
+          "timestamp": "2026-01-02T03:04:00+00:00",
+          "fields": [
+            {
+              "name": "Duration",
+              "value": "42 seconds",
+              "inline": true
+            },
+            {
+              "name": "Details",
+              "value": "one\ntwo",
+              "inline": false
+            },
+            {
+              "name": "Zero",
+              "value": "0"
+            }
+          ],
+          "footer": {
+            "text": "Fixture footer",
+            "icon_url": "https://example.invalid/footer.png"
+          },
+          "author": {
+            "name": "Fixture service",
+            "url": "https://example.invalid/service",
+            "icon_url": "https://example.invalid/avatar.png"
+          },
+          "provider": {
+            "name": "Fixture provider",
+            "url": "https://example.invalid/provider"
+          },
+          "thumbnail": {
+            "url": "https://example.invalid/thumb.png",
+            "width": 16,
+            "height": 16
+          },
+          "image": {
+            "url": "https://example.invalid/image.png",
+            "width": 640,
+            "height": 480
+          },
+          "video": {
+            "url": "https://example.invalid/video.mp4",
+            "width": 320,
+            "height": 240
+          },
+          "flags": 32,
+          "future_discord_key": {
+            "keep": true
+          }
+        },
+        {
+          "description": "Unicode fixture: 한글 · café",
+          "fields": [
+            {
+              "name": "Fallback inline",
+              "value": "visible"
+            }
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "id": "801",
+          "filename": "fixture.json",
+          "title": "Fixture report",
+          "description": "Complete fixture output",
+          "content_type": "application/json",
+          "size": 42,
+          "url": "https://example.invalid/fixture.json",
+          "proxy_url": "https://example.invalid/proxy/fixture.json",
+          "height": null,
+          "width": null,
+          "placeholder": "fixture-placeholder",
+          "placeholder_version": 1,
+          "ephemeral": false,
+          "duration_secs": 1.25,
+          "waveform": "fixture-waveform",
+          "flags": 0,
+          "clip_participants": [
+            "42"
+          ],
+          "clip_created_at": "2026-01-02T03:00:00+00:00",
+          "application": {
+            "id": "901"
+          },
+          "future_attachment_key": {
+            "keep": "raw"
+          }
+        }
+      ]
+    }
+  ],
+  "channels": [
+    {
+      "id": "101",
+      "guild_id": "100",
+      "type": 0,
+      "name": "fixture-general",
+      "topic": "Fixture topic",
+      "parent_id": "102",
+      "position": 1,
+      "permission_overwrites": [
+        {
+          "id": "100",
+          "type": 0,
+          "allow": "1024",
+          "deny": "0"
+        }
+      ],
+      "future_channel_key": {
+        "keep": true
+      }
+    },
+    {
+      "id": "102",
+      "guild_id": "100",
+      "type": 4,
+      "name": "fixture-category",
+      "parent_id": null,
+      "position": 0
+    },
+    {
+      "name": "ignored-no-id"
+    },
+    null,
+    {
+      "id": 999,
+      "name": "ignored-numeric-id"
+    }
+  ],
+  "user": {
+    "id": "42",
+    "username": "fixture-user",
+    "global_name": "Fixture User",
+    "discriminator": "0",
+    "avatar": null,
+    "bot": false,
+    "public_flags": 64,
+    "future_user_key": {
+      "keep": true
+    }
+  },
+  "guild_member": {
+    "user": {
+      "id": "42",
+      "username": "fixture-user",
+      "global_name": "Fixture User"
+    },
+    "nick": "Fixture nickname",
+    "avatar": null,
+    "roles": [
+      "501",
+      "502"
+    ],
+    "joined_at": "2026-01-01T00:00:00+00:00",
+    "premium_since": null,
+    "deaf": false,
+    "mute": false,
+    "flags": 0,
+    "pending": false,
+    "communication_disabled_until": null
+  }
+}
