@@ -24,6 +24,8 @@ type apiError struct {
 	message    string
 	statusCode int
 	retryAfter time.Duration
+	// unknown marks a write that may have reached Discord: a retry could apply it twice.
+	unknown bool
 }
 
 func (e *apiError) Error() string { return e.message }
@@ -63,6 +65,15 @@ func (c *discordClient) request(ctx context.Context, method, path string, body o
 	case <-ctx.Done():
 		return nil, &apiError{message: "Discord API request cancelled"}
 	}
+	// A write that fails after it may have reached Discord is reported as an
+	// unknown outcome, so callers read back instead of blindly retrying.
+	ambiguous := func(e *apiError) *apiError {
+		if method != http.MethodGet {
+			e.unknown = true
+			e.message = "Discord API write outcome unknown (" + e.message + "); it may have been applied, so read the resource back before retrying"
+		}
+		return e
+	}
 	var encoded []byte
 	if body != nil {
 		var err error
@@ -83,12 +94,16 @@ func (c *discordClient) request(ctx context.Context, method, path string, body o
 		}
 		resp, err := c.http.Do(req)
 		if err != nil {
-			return nil, &apiError{message: "Discord API request failed"}
+			return nil, ambiguous(&apiError{message: "Discord API request failed"})
 		}
 		data, readErr := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		if readErr != nil {
-			return nil, &apiError{message: "Discord API response could not be read", statusCode: resp.StatusCode}
+			e := &apiError{message: "Discord API response could not be read", statusCode: resp.StatusCode}
+			if resp.StatusCode >= 400 && resp.StatusCode < 500 {
+				return nil, e
+			}
+			return nil, ambiguous(e)
 		}
 		if resp.StatusCode == http.StatusTooManyRequests {
 			delay := retryAfter(resp.Header.Get("Retry-After"), data)
@@ -112,7 +127,11 @@ func (c *discordClient) request(ctx context.Context, method, path string, body o
 					message += ": " + detail.Message
 				}
 			}
-			return nil, &apiError{message: message, statusCode: resp.StatusCode}
+			e := &apiError{message: message, statusCode: resp.StatusCode}
+			if resp.StatusCode >= 500 {
+				return nil, ambiguous(e)
+			}
+			return nil, e
 		}
 		if resp.StatusCode == http.StatusNoContent {
 			return nil, nil
@@ -121,10 +140,10 @@ func (c *discordClient) request(ctx context.Context, method, path string, body o
 		dec := json.NewDecoder(bytes.NewReader(data))
 		dec.UseNumber()
 		if err := dec.Decode(&payload); err != nil {
-			return nil, &apiError{message: "Discord API returned invalid JSON", statusCode: resp.StatusCode}
+			return nil, ambiguous(&apiError{message: "Discord API returned invalid JSON", statusCode: resp.StatusCode})
 		}
 		if err := dec.Decode(new(any)); err != io.EOF {
-			return nil, &apiError{message: "Discord API returned invalid JSON", statusCode: resp.StatusCode}
+			return nil, ambiguous(&apiError{message: "Discord API returned invalid JSON", statusCode: resp.StatusCode})
 		}
 		return payload, nil
 	}
