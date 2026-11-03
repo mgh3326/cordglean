@@ -95,7 +95,7 @@ These eight tools are registered only when `CORDGLEAN_ENABLE_WRITE=1`:
 
 | Tool | Arguments | Bot permissions |
 | --- | --- | --- |
-| `send_message` | `channel_id`, `content`, optional `embeds`, `allow_mass_mention=false` | Send Messages; Embed Links for embeds; Send Messages in Threads for threads |
+| `send_message` | `channel_id`, `content`, optional `embeds`, `allow_mass_mention=false`, `nonce` | Send Messages; Embed Links for embeds; Send Messages in Threads for threads |
 | `create_channel` | `guild_id`, `name`, optional `parent_id`, `topic` | Manage Channels |
 | `edit_channel` | `channel_id`, optional `name`, `topic`, `parent_id` | Manage Channels |
 | `archive_channel` | `channel_id`, `archive_category_id` | Manage Channels and Manage Roles |
@@ -111,7 +111,7 @@ require Manage Roles when changing permission overwrites.
 
 ### Messages
 
-`send_message` returns `message_id`. Content is limited to 2,000 characters.
+`send_message` returns `message_id` and `nonce`. Content is limited to 2,000 characters.
 Messages support up to ten embeds with 6,000 combined text characters, subject
 to Discord's per-field limits. Empty content requires an embed.
 
@@ -120,6 +120,14 @@ occurrences in embeds. The request also sets `allowed_mentions` explicitly.
 User and role pings are suppressed; explicit mass-mention opt-in permits only
 everyone mentions, subject to the bot's Mention Everyone permission. Limits
 follow the [Discord message API](https://docs.discord.com/developers/resources/message#embed-object-embed-limits).
+
+Every message is sent with a Discord `nonce` and `enforce_nonce: true`. The
+nonce is the caller's `nonce` (1–25 characters) or a generated 24-character
+value. Per the [Create Message](https://docs.discord.com/developers/resources/message#create-message)
+API, Discord checks an enforced nonce for uniqueness over the past few minutes.
+If the same author already created a message with that nonce, Discord returns
+that message and creates no new one. To retry a send whose outcome is unknown,
+pass the reported nonce again.
 
 ### Channel changes and deletion
 
@@ -162,7 +170,8 @@ recovery after power loss is not guaranteed.
 
 Webhook tokens, URLs, response bodies, message content, names, and file paths
 are excluded from audit lines. Every management operation that reaches its
-handler logs one line with the tool, target ID, and outcome to stderr. The MCP
+handler logs one line with the tool, target ID, and outcome to stderr. The
+outcome is `success`, `failure`, `refused`, or `unknown`. The MCP
 SDK rejects invalid argument shapes before the handler runs, so those calls
 have no operation audit line. Management HTTP and filesystem
 errors use fixed descriptions instead of remote response bodies or raw errors.
@@ -175,6 +184,13 @@ the `Retry-After` header or JSON `retry_after`, with a one-second fallback for
 invalid values. Delays above 30 seconds return a rate-limit error without an
 early retry. Transport failures and other HTTP errors are not retried, avoiding
 duplicate writes after an ambiguous network failure.
+
+A write (POST, PATCH, PUT, or DELETE) that fails at the transport level, gets
+an HTTP 5xx, or gets a successful status with an unreadable or invalid body may
+already have taken effect. The tool reports the outcome as unknown, not as a
+failure, and the audit line records `unknown`. Read the resource back before
+retrying; for `send_message`, check the channel's latest messages, then retry
+only with the reported `nonce`. Reads keep their existing errors.
 
 ## Verification
 

@@ -104,7 +104,7 @@ func TestWriteRequests(t *testing.T) {
 		name, method, path string
 		args, body         object
 	}{
-		{"send_message", "POST", "/channels/123/messages", object{"channel_id": "123", "content": "hello", "embeds": []any{object{"description": "status"}}}, object{"content": "hello", "embeds": []any{object{"description": "status"}}, "allowed_mentions": object{"parse": []string{}}}},
+		{"send_message", "POST", "/channels/123/messages", object{"channel_id": "123", "content": "hello", "embeds": []any{object{"description": "status"}}, "nonce": "retry-1"}, object{"content": "hello", "embeds": []any{object{"description": "status"}}, "allowed_mentions": object{"parse": []string{}}, "nonce": "retry-1", "enforce_nonce": true}},
 		{"create_channel", "POST", "/guilds/111/channels", object{"guild_id": "111", "name": "alerts", "parent_id": "456", "topic": "monitoring"}, object{"name": "alerts", "type": 0, "parent_id": "456", "topic": "monitoring"}},
 		{"edit_channel", "PATCH", "/channels/123", object{"channel_id": "123", "name": "new-alerts", "parent_id": "456", "topic": ""}, object{"name": "new-alerts", "parent_id": "456", "topic": ""}},
 		{"edit_channel", "PATCH", "/channels/123", object{"channel_id": "123", "parent_id": nil}, object{"parent_id": nil}},
@@ -340,6 +340,7 @@ func TestMessageRefusals(t *testing.T) {
 		{"embed_description", object{"content": "", "embeds": []any{object{"description": strings.Repeat("x", 4097)}}}},
 		{"embed_total", object{"content": "", "embeds": []any{object{"description": strings.Repeat("x", 3001)}, object{"description": strings.Repeat("x", 3000)}}}},
 		{"embed_field", object{"content": "", "embeds": []any{object{"fields": []any{object{"name": "field", "value": strings.Repeat("x", 1025)}}}}}},
+		{"nonce_too_long", object{"content": "hi", "nonce": strings.Repeat("n", 26)}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			session, _, _ := fakeMCP(t, testConfig(), nil)
@@ -494,7 +495,106 @@ func TestWebhookErrorPathsDoNotLeakSecrets(t *testing.T) {
 			if deletes != wantDeletes {
 				t.Fatalf("cleanup calls=%d, want=%d", deletes, wantDeletes)
 			}
-			assertOneAudit(t, logs, "create_webhook", "123", "failure")
+			outcome := "failure"
+			if kind == "transport" || kind == "invalid_json" {
+				// The webhook may exist even though its secret was not returned.
+				outcome = "unknown"
+			}
+			assertOneAudit(t, logs, "create_webhook", "123", outcome)
 		})
+	}
+}
+
+func TestAmbiguousWriteOutcomeIsUnknown(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		respond func() (*http.Response, error)
+		outcome string
+	}{
+		{"transport", func() (*http.Response, error) { return nil, errors.New("timeout after send") }, "unknown"},
+		{"http_500", func() (*http.Response, error) { return fakeResponse(500, object{"message": fixtureSecret}), nil }, "unknown"},
+		{"http_503", func() (*http.Response, error) { return fakeResponse(503, nil), nil }, "unknown"},
+		{"http_400", func() (*http.Response, error) { return fakeResponse(400, object{"message": fixtureSecret}), nil }, "failure"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var nonce any
+			calls := 0
+			session, _, logs := fakeMCP(t, testConfig(), func(req *http.Request) (*http.Response, error) {
+				calls++
+				body := requestBody(t, req)
+				nonce = body["nonce"]
+				if body["enforce_nonce"] != true {
+					t.Fatalf("enforce_nonce missing: %v", body)
+				}
+				return tc.respond()
+			})
+			result := callTool(t, session, "send_message", object{"channel_id": "123", "content": "hello"})
+			output := resultString(t, result)
+			if !result.IsError || calls != 1 || strings.Contains(output+logs.String(), fixtureSecret) {
+				t.Fatalf("calls=%d result=%s", calls, output)
+			}
+			generated, _ := nonce.(string)
+			if len(generated) != 24 {
+				t.Fatalf("generated nonce %q, want 24 characters", generated)
+			}
+			unknown := strings.Contains(output, "outcome unknown") && strings.Contains(output, "read_channel") &&
+				strings.Contains(output, "nonce="+generated)
+			if unknown != (tc.outcome == "unknown") {
+				t.Fatalf("outcome hint mismatch for %s: %s", tc.outcome, output)
+			}
+			assertOneAudit(t, logs, "send_message", "123", tc.outcome)
+		})
+	}
+	t.Run("other_writes", func(t *testing.T) {
+		for _, tc := range []struct {
+			tool, target string
+			args         object
+		}{
+			{"create_channel", "111", object{"guild_id": "111", "name": "alerts"}},
+			{"edit_channel", "123", object{"channel_id": "123", "name": "alerts"}},
+		} {
+			session, _, logs := fakeMCP(t, testConfig(), func(*http.Request) (*http.Response, error) {
+				return nil, errors.New("timeout after send")
+			})
+			result := callTool(t, session, tc.tool, tc.args)
+			if output := resultString(t, result); !result.IsError || !strings.Contains(output, "read the resource back before retrying") {
+				t.Fatalf("%s: %s", tc.tool, output)
+			}
+			assertOneAudit(t, logs, tc.tool, tc.target, "unknown")
+		}
+	})
+	t.Run("reads_unchanged", func(t *testing.T) {
+		session, _, _ := fakeMCP(t, testConfig(), func(*http.Request) (*http.Response, error) {
+			return nil, errors.New("timeout")
+		})
+		output := resultString(t, callTool(t, session, "read_channel", object{"channel_id": "123"}))
+		if !strings.Contains(output, "Discord API request failed") || strings.Contains(output, "unknown") {
+			t.Fatalf("read error changed: %s", output)
+		}
+	})
+}
+
+func TestSendMessageNonceRetry(t *testing.T) {
+	var nonces []any
+	session, _, logs := fakeMCP(t, testConfig(), func(req *http.Request) (*http.Response, error) {
+		nonces = append(nonces, requestBody(t, req)["nonce"])
+		if len(nonces) == 1 {
+			return nil, errors.New("timeout after send")
+		}
+		// Discord answers a repeated enforced nonce with the original message.
+		return fakeResponse(200, object{"id": "789"}), nil
+	})
+	first := callTool(t, session, "send_message", object{"channel_id": "123", "content": "hello"})
+	nonce, _ := nonces[0].(string)
+	if !first.IsError || nonce == "" || !strings.Contains(resultString(t, first), "nonce="+nonce) {
+		t.Fatalf("first attempt did not report its nonce: %s", resultString(t, first))
+	}
+	retry := callTool(t, session, "send_message", object{"channel_id": "123", "content": "hello", "nonce": nonce})
+	if retry.IsError || nonces[1] != nonce {
+		t.Fatalf("retry did not reuse nonce: %v %s", nonces, resultString(t, retry))
+	}
+	assertJSONEqual(t, retry.StructuredContent, object{"message_id": "789", "nonce": nonce})
+	if logs.String() != "tool=send_message target=123 outcome=unknown\ntool=send_message target=123 outcome=success\n" {
+		t.Fatalf("audit mismatch: %q", logs.String())
 	}
 }

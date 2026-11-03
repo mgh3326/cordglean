@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"log"
@@ -35,7 +37,9 @@ func (w *writeService) run(ctx context.Context, tool, target string, fn func(con
 	} else {
 		var api *apiError
 		var file *secretFileError
-		if !errors.As(err, &api) && !errors.As(err, &file) {
+		if errors.As(err, &api) && api.unknown {
+			outcome = "unknown"
+		} else if api == nil && !errors.As(err, &file) {
 			outcome = "refused"
 		}
 	}
@@ -70,6 +74,16 @@ type sendMessageInput struct {
 	Content          string   `json:"content"`
 	Embeds           []object `json:"embeds,omitempty"`
 	AllowMassMention bool     `json:"allow_mass_mention,omitempty"`
+	Nonce            string   `json:"nonce,omitempty"`
+}
+
+// newNonce returns 24 hex characters, within Discord's 25-character nonce limit.
+func newNonce() (string, error) {
+	var b [12]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		return "", errors.New("message nonce could not be generated")
+	}
+	return hex.EncodeToString(b[:]), nil
 }
 
 func (w *writeService) sendMessage(ctx context.Context, in sendMessageInput) (object, error) {
@@ -85,6 +99,15 @@ func (w *writeService) sendMessage(ctx context.Context, in sendMessageInput) (ob
 	if err := validateEmbeds(in.Embeds); err != nil {
 		return nil, err
 	}
+	nonce := in.Nonce
+	if nonce == "" {
+		var err error
+		if nonce, err = newNonce(); err != nil {
+			return nil, err
+		}
+	} else if err := boundedText(nonce, "nonce (maximum 25 characters)", 1, 25); err != nil {
+		return nil, err
+	}
 	embedText, _ := json.Marshal(in.Embeds)
 	if !in.AllowMassMention && (strings.Contains(in.Content, "@everyone") || strings.Contains(in.Content, "@here") ||
 		strings.Contains(string(embedText), "@everyone") || strings.Contains(string(embedText), "@here")) {
@@ -94,13 +117,22 @@ func (w *writeService) sendMessage(ctx context.Context, in sendMessageInput) (ob
 	if in.AllowMassMention {
 		parse = append(parse, "everyone")
 	}
-	body := object{"content": in.Content, "allowed_mentions": object{"parse": parse}}
+	// enforce_nonce makes Discord return the earlier message for a repeated nonce
+	// instead of posting a duplicate, within its few-minute window.
+	body := object{"content": in.Content, "allowed_mentions": object{"parse": parse}, "nonce": nonce, "enforce_nonce": true}
 	permission := "Send Messages"
 	if len(in.Embeds) > 0 {
 		body["embeds"] = in.Embeds
 		permission += " and Embed Links"
 	}
 	payload, err := w.request(ctx, http.MethodPost, "/channels/"+in.ChannelID+"/messages", body, permission)
+	var api *apiError
+	if errors.As(err, &api) && api.unknown {
+		return nil, &apiError{
+			message:    api.message + ". Check the channel's latest messages with read_channel; if the message is missing, retry with nonce=" + nonce + " so Discord does not post it twice",
+			statusCode: api.statusCode, unknown: true,
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +141,7 @@ func (w *writeService) sendMessage(ctx context.Context, in sendMessageInput) (ob
 		return nil, err
 	}
 	id, err := returnedID(m)
-	return object{"message_id": id}, err
+	return object{"message_id": id, "nonce": nonce}, err
 }
 
 type createChannelInput struct {

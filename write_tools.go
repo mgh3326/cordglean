@@ -15,7 +15,8 @@ func addWriteTool[In any](s *mcp.Server, w *writeService, tool *mcp.Tool, target
 
 func registerWriteTools(s *mcp.Server, w *writeService) {
 	addWriteTool(s, w, &mcp.Tool{
-		Name: "send_message", Description: "Post a message. Mass mentions require allow_mass_mention=true; all other pings are suppressed.",
+		Name: "send_message", Description: "Post a message. Mass mentions require allow_mass_mention=true; all other pings are suppressed. " +
+			"Returns message_id and nonce. After an unknown outcome, read the channel first; retry only with the same nonce so Discord drops a duplicate.",
 	}, func(in sendMessageInput) string { return in.ChannelID }, w.sendMessage)
 	addWriteTool(s, w, &mcp.Tool{
 		Name: "create_channel", Description: "Create a guild text channel, optionally under a category.",
