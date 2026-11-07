@@ -1,18 +1,46 @@
 name: Go checks
 
+# The PR stage (operator decision 2026-11-07,
+# hk:doc decision/2026-11-07/fleet-ci-three-tiers-r2 §1): format, static checks
+# and the fast unit tests, unchanged, and the merge condition. A push to main
+# belongs to the main stage (main.yml, which posts ci-ok) and to deploy.yml, so
+# it is excluded here; every other branch push keeps today's behaviour.
+#
+# workflow_dispatch is the manual/any-ref entry (r2 §4-4). It lives here because
+# GitHub only accepts a workflow_dispatch event for a workflow file that exists
+# on the default branch; checks.yml does, while main.yml and deploy.yml only
+# arrive with this PR. stage=main/deploy call those files from this ref, which
+# is how this branch's stages are run and timed before merge. After merge the
+# direct `gh workflow run main.yml|deploy.yml --ref ...` path works as well.
 on:
   push:
+    branches-ignore: [main]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Stage to run
+        required: true
+        default: pr
+        type: choice
+        options: [pr, main, deploy]
+      ref:
+        description: Exact ref or sha (empty means this dispatch's ref)
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
 
 jobs:
   checks:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.stage == 'pr' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.ref }}
           persist-credentials: false
       - uses: actions/setup-go@v7
         with:
@@ -22,3 +50,21 @@ jobs:
       - run: go test ./...
       - name: Check formatting
         run: test -z "$(gofmt -l .)"
+
+  manual-main:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.stage == 'main' }}
+    permissions:
+      contents: read
+      statuses: write
+    uses: ./.github/workflows/main.yml
+    with:
+      ref: ${{ inputs.ref }}
+
+  manual-deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.stage == 'deploy' }}
+    permissions:
+      contents: read
+      statuses: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: ${{ inputs.ref }}

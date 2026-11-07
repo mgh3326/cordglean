@@ -1,0 +1,97 @@
+name: CI main
+
+# The main stage (operator decision 2026-11-07,
+# hk:doc decision/2026-11-07/fleet-ci-three-tiers-r2 §1, §4-2): every basic
+# check on a push to main, kept light (target ≤10 min). The heavy checks — the
+# -race suite, macOS, the four release artifacts and the install smoke — run in
+# deploy.yml, which workflow_run starts from this workflow's successful main run
+# for the same sha. The main stage posts the commit status ci-ok.
+#
+# workflow_dispatch and workflow_call exist so this stage can be run on any ref
+# before merge (checks.yml's manual entry calls it; workflow_run and
+# workflow_dispatch only work for a workflow file that exists on the default
+# branch).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact ref or sha (empty means the caller's/event's ref)
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  # A newer push to main cancels the older main run (r2 §1).
+  group: ci-main-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  candidate:
+    # Resolve the sha the stage is about, once, so every job and the ci-ok
+    # status refer to the same commit.
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - name: Resolve the sha
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  basic:
+    # The basic check set, moved explicitly from checks.yml: go vet, go test and
+    # the gofmt check. Nothing else ran on main before this PR.
+    needs: candidate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.candidate.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: go vet ./...
+      - run: go test ./...
+      - name: Check formatting
+        run: test -z "$(gofmt -l .)"
+
+  ci-ok:
+    name: ci-ok
+    needs: [candidate, basic]
+    # The verdict is always posted, including on a failure, so the sha is never
+    # left looking green by a missing status. If the sha could not be resolved
+    # there is nothing to post to; a missing status reads as unknown.
+    if: ${{ always() && needs.candidate.outputs.sha != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - name: Post ci-ok commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TARGET_SHA: ${{ needs.candidate.outputs.sha }}
+          BASIC_RESULT: ${{ needs.basic.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          case "$BASIC_RESULT" in
+            success) state=success ;;
+            cancelled) state=error ;;
+            *) state=failure ;;
+          esac
+          gh api "repos/${REPO}/statuses/${TARGET_SHA}" \
+            -f state="$state" \
+            -f context=ci-ok \
+            -f target_url="$RUN_URL" \
+            -f description="main stage: vet, test, gofmt ($BASIC_RESULT)"
