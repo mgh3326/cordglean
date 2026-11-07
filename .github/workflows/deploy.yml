@@ -173,8 +173,8 @@ jobs:
           elif [ "$state" = failure ]; then result=failure
           fi
           short_sha=${TARGET_SHA:0:12}
-          short_digest=${ARTIFACT_DIGEST:0:16}
-          description="repo=$REPO sha=$short_sha policy=$POLICY_REVISION suite=deploy env=github-hosted run=$RUN_ID $result digest=$short_digest"
+          short_digest=${ARTIFACT_DIGEST:0:12}
+          description="repo=$REPO sha=$short_sha policy=$POLICY_REVISION suite=deploy env=github run=$RUN_ID $result digest=$short_digest"
           if [ "${#description}" -gt 140 ]; then
             echo "deploy-ok description is ${#description} characters, over the 140 limit" >&2; exit 1
           fi
