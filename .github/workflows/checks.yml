@@ -1,7 +1,13 @@
 name: Go checks
 
+# The PR stage (operator decision 2026-11-07,
+# hk:doc decision/2026-11-07/fleet-ci-three-tiers-r2 §1): format, static checks
+# and the fast unit tests, unchanged, and the merge condition. A push to main
+# belongs to the main stage (main.yml, which posts ci-ok) and to deploy.yml, so
+# it is excluded here; every other branch push keeps today's behaviour.
 on:
   push:
+    branches-ignore: [main]
   pull_request:
 
 permissions:

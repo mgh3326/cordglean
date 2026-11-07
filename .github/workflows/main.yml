@@ -1,0 +1,72 @@
+name: CI main
+
+# The main stage (operator decision 2026-11-07,
+# hk:doc decision/2026-11-07/fleet-ci-three-tiers-r2 §1, §4-2): every basic
+# check on a push to main, kept light (target ≤10 min). The heavy checks — the
+# -race suite, macOS, the four release artifacts and the install smoke — run in
+# deploy.yml, which workflow_run starts from this workflow's successful main run
+# for the same sha. The main stage posts the commit status ci-ok.
+#
+# workflow_dispatch exists so this stage can be run and timed on any branch
+# (`gh workflow run main.yml --ref <branch>`); workflow_run fires only from the
+# default branch, so this is also how deploy.yml gets a same-sha trigger before
+# the PR merges.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A newer push to main cancels the older main run (r2 §1).
+  group: ci-main-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  basic:
+    # The basic check set, moved explicitly from checks.yml: go vet, go test and
+    # the gofmt check. Nothing else ran on main before this PR.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: go vet ./...
+      - run: go test ./...
+      - name: Check formatting
+        run: test -z "$(gofmt -l .)"
+
+  ci-ok:
+    name: ci-ok
+    needs: [basic]
+    # The verdict is always posted, including on a failure, so the sha is never
+    # left looking green by a missing status.
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - name: Post ci-ok commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TARGET_SHA: ${{ github.sha }}
+          BASIC_RESULT: ${{ needs.basic.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          case "$BASIC_RESULT" in
+            success) state=success ;;
+            cancelled) state=error ;;
+            *) state=failure ;;
+          esac
+          gh api "repos/${REPO}/statuses/${TARGET_SHA}" \
+            -f state="$state" \
+            -f context=ci-ok \
+            -f target_url="$RUN_URL" \
+            -f description="main stage: vet, test, gofmt ($BASIC_RESULT)"
