@@ -118,7 +118,8 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          # release.yml's toolchain, so the evidence is the shipped build.
+          go-version: '1.27.x'
           cache: true
       # The same script release.yml runs, with a dry-run tag (v0.0.0-* is never
       # published). It builds linux/darwin × amd64/arm64 plus SHA256SUMS.
