@@ -22,6 +22,9 @@ func registerWriteTools(s *mcp.Server, w *writeService) {
 		Name: "create_channel", Description: "Create a guild text channel, optionally under a category.",
 	}, func(in createChannelInput) string { return in.GuildID }, w.createChannel)
 	addWriteTool(s, w, &mcp.Tool{
+		Name: "create_thread", Description: "Create a thread. A forum or media channel takes content and opens a post; a text channel starts from message_id or, without it, a standalone public thread. Returns thread_id, name and parent_id. After an unknown outcome, check list_active_threads for the name before creating again.",
+	}, func(in createThreadInput) string { return in.ChannelID }, w.createThread)
+	addWriteTool(s, w, &mcp.Tool{
 		Name: "edit_channel", Description: "Edit channel fields. An explicit parent_id=null removes the channel from its category.",
 		InputSchema: object{
 			"type": "object", "required": []string{"channel_id"},

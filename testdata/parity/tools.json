@@ -189,6 +189,38 @@
         "title": "read_user_profileDictOutput",
         "type": "object"
       }
+    },
+    {
+      "name": "list_active_threads",
+      "description": "List active threads under a channel. include_archived adds one page of archived public threads; limit (1-100) sizes that page.",
+      "inputSchema": {
+        "properties": {
+          "channel_id": {
+            "title": "Channel Id",
+            "type": "string"
+          },
+          "include_archived": {
+            "default": false,
+            "title": "Include Archived",
+            "type": "boolean"
+          },
+          "limit": {
+            "default": 50,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "channel_id"
+        ],
+        "title": "list_active_threadsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "list_active_threadsDictOutput",
+        "type": "object"
+      }
     }
   ]
 }

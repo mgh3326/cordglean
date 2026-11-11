@@ -51,7 +51,7 @@ func (w *writeService) request(ctx context.Context, method, path string, body ob
 }
 
 func (w *writeService) channel(ctx context.Context, id, permission string) (object, error) {
-	if err := w.client.config.requireChannel(id); err != nil {
+	if err := w.client.requireChannel(ctx, id); err != nil {
 		return nil, err
 	}
 	payload, err := w.request(ctx, http.MethodGet, "/channels/"+id, nil, permission)
@@ -87,7 +87,7 @@ func newNonce() (string, error) {
 }
 
 func (w *writeService) sendMessage(ctx context.Context, in sendMessageInput) (object, error) {
-	if err := w.client.config.requireChannel(in.ChannelID); err != nil {
+	if err := w.client.requireChannel(ctx, in.ChannelID); err != nil {
 		return nil, err
 	}
 	if err := boundedText(in.Content, "content (maximum 2000 characters)", 0, 2000); err != nil {
@@ -197,7 +197,7 @@ type editChannelInput struct {
 }
 
 func (w *writeService) editChannel(ctx context.Context, in editChannelInput) (object, error) {
-	if err := w.client.config.requireChannel(in.ChannelID); err != nil {
+	if err := w.client.requireChannel(ctx, in.ChannelID); err != nil {
 		return nil, err
 	}
 	body := object{}
@@ -215,7 +215,7 @@ func (w *writeService) editChannel(ctx context.Context, in editChannelInput) (ob
 	}
 	if in.ParentID.set {
 		if in.ParentID.value != nil {
-			if err := w.client.config.requireChannel(*in.ParentID.value); err != nil {
+			if err := w.client.requireChannel(ctx, *in.ParentID.value); err != nil {
 				return nil, err
 			}
 		}
@@ -250,7 +250,7 @@ type archiveChannelInput struct {
 
 func (w *writeService) archiveChannel(ctx context.Context, in archiveChannelInput) (object, error) {
 	permission := "Manage Channels and Manage Roles"
-	if err := w.client.config.requireChannel(in.ArchiveCategoryID); err != nil {
+	if err := w.client.requireChannel(ctx, in.ArchiveCategoryID); err != nil {
 		return nil, err
 	}
 	channel, err := w.channel(ctx, in.ChannelID, permission)
@@ -346,7 +346,7 @@ func (w *writeService) listWebhooks(ctx context.Context, in listWebhooksInput) (
 	}
 	var path string
 	if in.ChannelID != nil {
-		if err := w.client.config.requireChannel(*in.ChannelID); err != nil {
+		if err := w.client.requireChannel(ctx, *in.ChannelID); err != nil {
 			return nil, err
 		}
 		path = "/channels/" + *in.ChannelID + "/webhooks"
@@ -375,7 +375,7 @@ func (w *writeService) listWebhooks(ctx context.Context, in listWebhooksInput) (
 			return nil, err
 		}
 		channelID, ok := m["channel_id"].(string)
-		if !ok || !w.client.config.permitsChannel(channelID) {
+		if !ok || (in.ChannelID == nil && !w.client.config.permitsChannel(channelID)) {
 			continue
 		}
 		var creator any
@@ -395,7 +395,7 @@ type createWebhookInput struct {
 }
 
 func (w *writeService) createWebhook(ctx context.Context, in createWebhookInput) (object, error) {
-	if err := w.client.config.requireChannel(in.ChannelID); err != nil {
+	if err := w.client.requireChannel(ctx, in.ChannelID); err != nil {
 		return nil, err
 	}
 	if err := boundedText(in.Name, "name", 1, 80); err != nil {
@@ -464,7 +464,7 @@ func (w *writeService) deleteWebhook(ctx context.Context, in deleteWebhookInput)
 	if !ok {
 		return nil, &apiError{message: "Discord API returned an invalid webhook channel"}
 	}
-	if err := w.client.config.requireChannel(channelID); err != nil {
+	if err := w.client.requireChannel(ctx, channelID); err != nil {
 		return nil, err
 	}
 	if name, ok := m["name"].(string); !ok || name != *in.Confirm {

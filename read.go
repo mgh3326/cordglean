@@ -9,7 +9,7 @@ import (
 )
 
 func (c *discordClient) readChannel(ctx context.Context, id string, limit int, before, after *string) (object, error) {
-	if err := c.config.requireChannel(id); err != nil {
+	if err := c.requireChannel(ctx, id); err != nil {
 		return nil, err
 	}
 	if limit < 1 || limit > 100 {
@@ -56,7 +56,7 @@ func (c *discordClient) readChannel(ctx context.Context, id string, limit int, b
 }
 
 func (c *discordClient) getMessage(ctx context.Context, channelID, messageID string, includeRaw bool) (object, error) {
-	if err := c.config.requireChannel(channelID); err != nil {
+	if err := c.requireChannel(ctx, channelID); err != nil {
 		return nil, err
 	}
 	if err := snowflake(messageID, "message_id"); err != nil {
@@ -88,7 +88,7 @@ func (c *discordClient) listChannels(ctx context.Context, guildID string) (objec
 	channels := make([]object, 0)
 	for _, item := range items {
 		if m := mapping(item); m != nil {
-			if id, ok := m["id"].(string); ok && c.config.permitsChannel(id) {
+			if c.config.permitsListed(m) {
 				channels = append(channels, m)
 			}
 		}

@@ -29,7 +29,9 @@ Files:
 - `cases.json`: tool names, arguments, expected requests, fixture keys and golden
   filenames, suitable for the Go parity test to consume directly.
 - `tools.json`: the original complete `tools/list` result, including descriptions
-  and input/output schemas.
+  and input/output schemas. Its `list_active_threads` entry is a Go-only read tool
+  added in hk 3989; the Python server never had it, so that entry has no Python
+  capture. The entry is kept identical to `read_tools.json`, which the server embeds.
 - `capture.json`: provenance and observed request evidence.
 - Nine goldens: `read_channel.golden.json`,
   `read_channel_before.golden.json`, `read_channel_empty.golden.json`,
