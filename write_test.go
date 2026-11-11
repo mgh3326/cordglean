@@ -78,9 +78,9 @@ func TestWriteFlagRegistration(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			want := map[string]bool{"read_channel": true, "read_thread": true, "get_message": true, "list_channels": true, "read_user_profile": true}
+			want := map[string]bool{"read_channel": true, "read_thread": true, "get_message": true, "list_channels": true, "read_user_profile": true, "list_active_threads": true}
 			if enabled {
-				for _, name := range []string{"send_message", "create_channel", "edit_channel", "archive_channel", "delete_channel", "list_webhooks", "create_webhook", "delete_webhook"} {
+				for _, name := range []string{"send_message", "create_channel", "create_thread", "edit_channel", "archive_channel", "delete_channel", "list_webhooks", "create_webhook", "delete_webhook"} {
 					want[name] = true
 				}
 			}

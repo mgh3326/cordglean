@@ -174,7 +174,7 @@ func TestInvalidToolListCursorIsRejected(t *testing.T) {
 	if _, err := session.ListTools(context.Background(), &mcp.ListToolsParams{Cursor: "invalid-cursor"}); err == nil {
 		t.Fatal("invalid tool cursor was accepted")
 	}
-	if result, err := session.ListTools(context.Background(), nil); err != nil || len(result.Tools) != 13 {
+	if result, err := session.ListTools(context.Background(), nil); err != nil || len(result.Tools) != 15 {
 		t.Fatal("server did not remain usable after rejecting the cursor")
 	}
 }

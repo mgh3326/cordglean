@@ -117,6 +117,9 @@ func newServer(c *discordClient, audit *log.Logger) *mcp.Server {
 	addReadTool(s, definitions["read_user_profile"], func(ctx context.Context, in userReadInput) (object, error) {
 		return c.readUserProfile(ctx, in.UserID, in.GuildID)
 	})
+	addReadTool(s, definitions["list_active_threads"], func(ctx context.Context, in listActiveThreadsInput) (object, error) {
+		return c.listActiveThreads(ctx, in.ChannelID, in.IncludeArchived, in.Limit)
+	})
 	if c.config.enableWrite {
 		if audit == nil {
 			audit = log.New(os.Stderr, "", 0)

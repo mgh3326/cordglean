@@ -64,6 +64,15 @@ the webhook's channel before deleting it. Parent and archive categories must
 also be allowlisted. `create_channel` refuses while an ID allowlist is active
 because the new channel has no authorized ID yet.
 
+A thread is admitted when its parent channel is allowlisted. The request names
+only the thread, so a channel the allowlist does not list is read once with
+`GET /channels/{id}`. The answer (the parent of a thread, or none for other
+channels) is kept for the life of the process. A failed read refuses the channel
+with the same error as an unlisted one. Guild channel listings use the
+`parent_id` already in each entry and make no request. Webhook listings by guild
+match each webhook's own channel, so webhooks in a thread appear only under a
+`channel_id` listing of that thread.
+
 Webhook deletion checks the channel once, then deletes by webhook ID. A move
 between those requests is not checked again. To enforce the channel boundary
 through Discord, deny the bot Manage Webhooks in channels outside the allowlist.
@@ -75,6 +84,7 @@ through Discord, deny the bot Manage Webhooks in channels outside the allowlist.
 - `read_thread(thread_id, limit=20, before=null, after=null)`
 - `list_channels(guild_id)`
 - `read_user_profile(user_id, guild_id=null)`
+- `list_active_threads(channel_id, include_archived=false, limit=50)`
 
 Message results include `display_text`, `rendered_embeds`, and attachment
 metadata. Rendered embeds retain titles, descriptions, links, colors,
@@ -91,12 +101,13 @@ additional access for voice channels, threads, or guild member profiles.
 
 ## Management tools
 
-These eight tools are registered only when `CORDGLEAN_ENABLE_WRITE=1`:
+These nine tools are registered only when `CORDGLEAN_ENABLE_WRITE=1`:
 
 | Tool | Arguments | Bot permissions |
 | --- | --- | --- |
 | `send_message` | `channel_id`, `content`, optional `embeds`, `allow_mass_mention=false`, `nonce` | Send Messages; Embed Links for embeds; Send Messages in Threads for threads |
 | `create_channel` | `guild_id`, `name`, optional `parent_id`, `topic` | Manage Channels |
+| `create_thread` | `channel_id`, `name`, optional `content`, `message_id`, `auto_archive_duration` | Create Public Threads; Send Messages for forum posts |
 | `edit_channel` | `channel_id`, optional `name`, `topic`, `parent_id` | Manage Channels |
 | `archive_channel` | `channel_id`, `archive_category_id` | Manage Channels and Manage Roles |
 | `delete_channel` | `channel_id`, `confirm` | Manage Channels |
@@ -128,6 +139,26 @@ API, Discord checks an enforced nonce for uniqueness over the past few minutes.
 If the same author already created a message with that nonce, Discord returns
 that message and creates no new one. To retry a send whose outcome is unknown,
 pass the reported nonce again.
+
+### Threads
+
+`create_thread` opens a thread in one of three ways. A forum or media channel
+takes `content`, which becomes the first message of a new post; mentions in that
+message are suppressed, as `send_message` suppresses them by default. A text
+channel takes `message_id` to start a thread from a message, or neither for a
+standalone public thread. `content` is refused for text channels, and
+`message_id` for forum channels. `auto_archive_duration` accepts 60, 1440, 4320,
+or 10080 minutes. The tool returns `thread_id`, `name`, and `parent_id`.
+
+After an unknown outcome the tool does not retry the request. Check
+`list_active_threads` for the name before creating another thread.
+
+`list_active_threads` is a read tool and needs no write flag. It returns the
+active threads whose parent is `channel_id`, from the guild's active-thread list.
+With `include_archived=true` it adds one page of the channel's archived public
+threads, sized by `limit` (1–100, default 50), and returns `has_more`. Each
+entry carries `id`, `name`, `parent_id`, `owner_id`, `archived`,
+`message_count`, `last_message_id`, and `created`.
 
 ### Channel changes and deletion
 

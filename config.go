@@ -61,13 +61,3 @@ func snowflake(value, label string) error {
 func (c config) permitsChannel(id string) bool {
 	return c.allowedChannels == nil || c.allowedChannels[id]
 }
-
-func (c config) requireChannel(id string) error {
-	if err := snowflake(id, "channel_id"); err != nil {
-		return err
-	}
-	if !c.permitsChannel(id) {
-		return errors.New("channel is not in DISCORD_ALLOWED_CHANNEL_IDS")
-	}
-	return nil
-}

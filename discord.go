@@ -10,6 +10,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -35,6 +36,9 @@ type discordClient struct {
 	http   *http.Client
 	gate   chan struct{}
 	sleep  func(context.Context, time.Duration) error
+	// parents caches thread parents resolved for the allowlist; see requireChannel.
+	parentsMu sync.Mutex
+	parents   map[string]string
 }
 
 func newDiscordClient(c config, h *http.Client) *discordClient {
@@ -43,7 +47,7 @@ func newDiscordClient(c config, h *http.Client) *discordClient {
 			return http.ErrUseLastResponse
 		}}
 	}
-	return &discordClient{config: c, http: h, gate: make(chan struct{}, 1), sleep: sleepContext}
+	return &discordClient{config: c, http: h, gate: make(chan struct{}, 1), sleep: sleepContext, parents: make(map[string]string)}
 }
 
 func sleepContext(ctx context.Context, delay time.Duration) error {

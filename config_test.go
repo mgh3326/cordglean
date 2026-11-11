@@ -63,7 +63,7 @@ func TestChannelAllowlistCoversWritesAndWebhookMetadata(t *testing.T) {
 		{"create_webhook", object{"channel_id": "456", "name": "alerts", "output_path": "unused"}},
 	} {
 		t.Run(tc.tool, func(t *testing.T) {
-			session, _, _ := fakeMCP(t, cfg, nil)
+			session, _, _ := fakeMCP(t, cfg, unlistedChannelOnly(t))
 			if !callTool(t, session, tc.tool, tc.args).IsError {
 				t.Fatal("allowlist bypass")
 			}
@@ -76,9 +76,12 @@ func TestChannelAllowlistCoversWritesAndWebhookMetadata(t *testing.T) {
 			if req.Method != "GET" {
 				t.Fatal("unauthorized webhook mutated")
 			}
+			if req.URL.Path == "/api/v10/channels/456" {
+				return fakeResponse(200, object{"id": "456", "type": 0, "guild_id": "111"}), nil
+			}
 			return fakeResponse(200, object{"id": "789", "channel_id": "456", "name": "alerts"}), nil
 		})
-		if !callTool(t, session, "delete_webhook", object{"webhook_id": "789", "confirm": "alerts"}).IsError || calls != 1 {
+		if !callTool(t, session, "delete_webhook", object{"webhook_id": "789", "confirm": "alerts"}).IsError || calls != 2 {
 			t.Fatal("webhook allowlist bypass")
 		}
 	})
